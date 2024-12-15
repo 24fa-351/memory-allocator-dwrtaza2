@@ -1,1 +1,0 @@
-gcc -o memalloc memory_manager.c main.c
