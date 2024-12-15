@@ -1,3 +1,19 @@
+#ifndef MEMORY_MANAGER_H
+#define MEMORY_MANAGER_H
+
+#include <stddef.h>
+
+// Custom malloc, free, and realloc functions
+void* my_malloc(size_t size);
+void my_free(void* pointer);
+void* my_realloc(void* pointer, size_t size);
+
+// Initialization for the memory manager
+void memory_manager_init(size_t heap_size);
+void memory_manager_cleanup();
+
+#endif
+
 #include "memory_manger.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,57 +54,57 @@ void memory_manager_cleanup() {
 }
 
 void* my_malloc(size_t size) {
-    FreeListNode* current = free_list;
-    FreeListNode* previous = NULL;
+    FreeListNode* current_node = free_list;
+    FreeListNode* previous_node = NULL;
 
-    while (current) {
-        if (current->size >= size) {
-            if (current->size > size + sizeof(FreeListNode)) {
+    while (current_node) {
+        if (current_node->size >= size) {
+            if (current_node->size > size + sizeof(FreeListNode)) {
                 // Split the block
-                FreeListNode* new_node = (FreeListNode*)((char*)current + sizeof(FreeListNode) + size);
-                new_node->size = current->size - size - sizeof(FreeListNode);
-                new_node->next = current->next;
-                current->size = size;
-                current->next = new_node;
+                FreeListNode* new_node = (FreeListNode*)((char*)current_node + sizeof(FreeListNode) + size);
+                new_node->size = current_node->size - size - sizeof(FreeListNode);
+                new_node->next = current_node->next;
+                current_node->size = size;
+                current_node->next = new_node;
             }
 
-            if (previous) {
-                previous->next = current->next;
+            if (previous_node) {
+                previous_node->next = current_node->next;
             } else {
-                free_list = current->next;
+                free_list = current_node->next;
             }
 
-            return (char*)current + sizeof(FreeListNode);
+            return (char*)current_node + sizeof(FreeListNode);
         }
 
-        previous = current;
-        current = current->next;
+        previous_node = current_node;
+        current_node = current_node->next;
     }
 
     return NULL; // No suitable block found
 }
 
-void my_free(void* ptr) {
-    if (!ptr) return;
+void my_free(void* pointer) {
+    if (!pointer) return;
 
-    FreeListNode* node = (FreeListNode*)((char*)ptr - sizeof(FreeListNode));
+    FreeListNode* node = (FreeListNode*)((char*)pointer - sizeof(FreeListNode));
     node->next = free_list;
     free_list = node;
 }
 
-void* my_realloc(void* ptr, size_t size) {
-    if (!ptr) return my_malloc(size);
+void* my_realloc(void* pointer, size_t size) {
+    if (!pointer) return my_malloc(size);
 
-    FreeListNode* node = (FreeListNode*)((char*)ptr - sizeof(FreeListNode));
+    FreeListNode* node = (FreeListNode*)((char*)pointer - sizeof(FreeListNode));
     if (node->size >= size) {
-        return ptr;
+        return pointer;
     }
 
-    void* new_ptr = my_malloc(size);
-    if (new_ptr) {
-        memcpy(new_ptr, ptr, node->size);
-        my_free(ptr);
+    void* new_pointer = my_malloc(size);
+    if (new_pointer) {
+        memcpy(new_pointer, pointer, node->size);
+        my_free(pointer);
     }
 
-    return new_ptr;
+    return new_pointer;
 }

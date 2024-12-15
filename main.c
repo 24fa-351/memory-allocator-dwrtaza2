@@ -1,34 +1,34 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "memory_manger.h"
+#include "memory_manager.h"
 
 void test_malloc_free() {
     printf("Running test_malloc_free...\n");
-    void* ptr = my_malloc(128);
-    if (!ptr) {
+    void* pointer = my_malloc(128);
+    if (!pointer) {
         printf("Failed: my_malloc returned NULL\n");
         return;
     }
-    memset(ptr, 0, 128); // Ensure memory is initialized to zero
-    my_free(ptr);
+    memset(pointer, 0, 128); // Ensure memory is initialized to zero
+    my_free(pointer);
     printf("Passed\n");
 }
 
 void test_realloc() {
     printf("Running test_realloc...\n");
-    void* ptr = my_malloc(64);
-    if (!ptr) {
+    void* pointer = my_malloc(64);
+    if (!pointer) {
         printf("Failed: my_malloc returned NULL\n");
         return;
     }
-    memset(ptr, 0xAA, 64); // Set a test pattern
-    ptr = my_realloc(ptr, 128);
-    if (!ptr) {
+    memset(pointer, 0xAA, 64); // Set a test pattern
+    pointer = my_realloc(pointer, 128);
+    if (!pointer) {
         printf("Failed: my_realloc returned NULL\n");
         return;
     }
-    my_free(ptr);
+    my_free(pointer);
     printf("Passed\n");
 }
 
